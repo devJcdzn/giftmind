@@ -37,9 +37,12 @@ export async function POST(request: Request) {
 
   if (sha === hash) {
     console.log("HMAC verification passed");
+    const response = await request.json();
+    console.log({ response });
+
     return NextResponse.json(
       {
-        response: request.json(),
+        response,
       },
       { status: 201 }
     );
