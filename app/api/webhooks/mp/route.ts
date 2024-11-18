@@ -2,6 +2,8 @@ import crypto from "crypto";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
+  const { action, data } = await request.json();
+
   const xSignature = request.headers.get("x-signature");
   const xRequestId = request.headers.get("x-request-id");
 
@@ -36,13 +38,32 @@ export async function POST(request: Request) {
   const sha = hmac.digest("hex");
 
   if (sha === hash) {
-    console.log("HMAC verification passed");
-    const response = await request.json();
-    console.log({ response });
+    const paymentId = data.id;
+
+    if (action === "payment.created" || action === "payment.updated") {
+      const response = await fetch(
+        `https://api.mercadopago.com/v1/payments/${paymentId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
+          },
+        }
+      );
+      const paymentDetails = await response.json();
+
+      if (paymentDetails.status === "approved") {
+        console.log("Pagamento aprovado!", paymentDetails);
+      } else if (paymentDetails.status === "pending") {
+        console.log("Pagamento pendente.", paymentDetails);
+      } else if (paymentDetails.status === "rejected") {
+        console.log("Pagamento rejeitado.", paymentDetails);
+      }
+    }
 
     return NextResponse.json(
       {
-        response,
+        success: true,
       },
       { status: 201 }
     );
