@@ -4,8 +4,8 @@ export async function POST(request: Request) {
   const xSignature = request.headers.get("x-signature");
   const xRequestId = request.headers.get("x-request-id");
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const dataId = urlParams.get("data.id");
+  const url = new URL(request.url);
+  const dataId = url.searchParams.get("data.id");
 
   const parts = xSignature?.split(",");
 
