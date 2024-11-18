@@ -1,6 +1,7 @@
 import crypto from "crypto";
+import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(request: Request, response: NextResponse) {
   const xSignature = request.headers.get("x-signature");
   const xRequestId = request.headers.get("x-request-id");
 
@@ -36,7 +37,19 @@ export async function POST(request: Request) {
 
   if (sha === hash) {
     console.log("HMAC verification passed");
-  } else {
-    console.log("HMAC verification failed");
+    return NextResponse.json(
+      {
+        response: request.json(),
+      },
+      { status: 201 }
+    );
   }
+
+  console.log("HMAC verification failed");
+  return NextResponse.json(
+    {
+      error: "HMAC verification failed",
+    },
+    { status: 500 }
+  );
 }
