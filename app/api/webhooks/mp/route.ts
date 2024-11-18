@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   const { action, data } = await request.json();
 
+  console.log({ data, action });
+
   const xSignature = request.headers.get("x-signature");
   const xRequestId = request.headers.get("x-request-id");
 
