@@ -53,6 +53,7 @@ export async function POST(request: Request) {
         }
       );
       const paymentDetails = await response.json();
+      console.log({ paymentDetails });
 
       if (paymentDetails.status === "approved") {
         console.log("Pagamento aprovado!", paymentDetails);
